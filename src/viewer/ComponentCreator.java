@@ -6,10 +6,28 @@ import java.awt.*;
 
 public class ComponentCreator {
 
+    private final Dimension buttonSize = new Dimension(80, 24);
+    private final Dimension labelSize = new Dimension(60,25);
+
+
+    public JLabel createLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setPreferredSize(labelSize);
+        return label;
+    }
+
     public JButton createOpenButton() {
-        JButton openButton = new JButton("Open");
-        openButton.setPreferredSize(new Dimension(80, 24));
-        openButton.setName("OpenFileButton");
+        return createButton("Open", "OpenFileButton");
+    }
+
+    public JButton createExecuteButton() {
+        return createButton("Execute", "ExecuteQueryButton");
+    }
+
+    private JButton createButton(String text, String name) {
+        JButton openButton = new JButton(text);
+        openButton.setPreferredSize(buttonSize);
+        openButton.setName(name);
         return openButton;
     }
 
@@ -20,8 +38,29 @@ public class ComponentCreator {
         return textField;
     }
 
-    public JPanel createTopPanel(JComponent... components) {
+    public JComboBox<String> createTablesComboBox() {
+        JComboBox<String> tablesComboBox = new JComboBox<>();
+        tablesComboBox.setName("TablesComboBox");
+        tablesComboBox.setPreferredSize(new Dimension(685, 25));
+        return tablesComboBox;
+    }
+
+
+    public JTextArea createQueryTextArea() {
+        JTextArea textArea = new JTextArea();
+        textArea.setName("QueryTextArea");
+        return textArea;
+    }
+
+    public JScrollPane createScrollPane(JTextArea textArea) {
+        JScrollPane pane = new JScrollPane(textArea);
+        pane.setPreferredSize(new Dimension(600, 60));
+        return pane;
+    }
+
+    public JPanel createPanel(JComponent... components) {
         JPanel panel = new JPanel();
+        panel.setPreferredSize(new Dimension(790, 140));
         for (JComponent component : components) {
             panel.add(component);
         }
