@@ -2,6 +2,7 @@ package viewer;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.TableModel;
 import java.awt.*;
 
 public class ComponentCreator {
@@ -66,5 +67,11 @@ public class ComponentCreator {
         }
         panel.setBorder(new EmptyBorder(new Insets(5, 5, 5, 5)));
         return panel;
+    }
+
+    public JTable getTable(TableModel model) {
+        JTable table = new JTable(model);
+        table.setName("Table");
+        return table;
     }
 }

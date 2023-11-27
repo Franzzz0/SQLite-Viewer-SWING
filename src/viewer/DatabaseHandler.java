@@ -2,18 +2,18 @@ package viewer;
 
 import org.sqlite.SQLiteDataSource;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import javax.swing.table.DefaultTableModel;
+import java.sql.*;
 import java.util.ArrayList;
 
 public class DatabaseHandler {
     private final SQLiteDataSource dataSource;
     private boolean connectionValid;
+    private final DefaultTableModel tableModel;
 
-    public DatabaseHandler() {
+    public DatabaseHandler(DefaultTableModel tableModel) {
         dataSource = new SQLiteDataSource();
+        this.tableModel = tableModel;
         connectionValid = false;
     }
 
@@ -58,12 +58,35 @@ public class DatabaseHandler {
         }
         try (Connection connection = dataSource.getConnection()) {
             try (Statement statement = connection.createStatement()) {
-                boolean result = statement.execute(query);
-                System.out.println("query executed");
-                System.out.println("received data: " + result);
+                if (query.matches("SELECT.*")) {
+                    ResultSet resultSet = statement.executeQuery(query);
+                    updateTable(resultSet);
+                } else {
+                    boolean result = statement.execute(query);
+                    System.out.println("query executed");
+                    System.out.println("received data: " + result);
+                }
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }
+    }
+
+    private void updateTable(ResultSet resultSet) throws SQLException {
+        tableModel.setRowCount(0);
+        ResultSetMetaData metaData = resultSet.getMetaData();
+        int columnCount = metaData.getColumnCount();
+        Object[] columns = new Object[columnCount];
+        for (int i = 0; i < columnCount; i++) {
+            columns[i] = metaData.getColumnName(i + 1);
+        }
+        tableModel.setColumnIdentifiers(columns);
+        while(resultSet.next()) {
+            Object[] row = new Object[columnCount];
+            for (int i = 1; i <= columnCount; i++) {
+                row [i - 1] = resultSet.getObject(i);
+            }
+            tableModel.addRow(row);
         }
     }
 
