@@ -1,8 +1,6 @@
+import com.google.gson.internal.$Gson$Preconditions;
 import org.assertj.swing.exception.ActionFailedException;
-import org.assertj.swing.fixture.JButtonFixture;
-import org.assertj.swing.fixture.JComboBoxFixture;
-import org.assertj.swing.fixture.JTableFixture;
-import org.assertj.swing.fixture.JTextComponentFixture;
+import org.assertj.swing.fixture.*;
 import org.hyperskill.hstest.dynamic.DynamicTest;
 import org.hyperskill.hstest.exception.outcomes.WrongAnswer;
 import org.hyperskill.hstest.stage.SwingTest;
@@ -11,6 +9,9 @@ import org.hyperskill.hstest.testing.swing.SwingComponent;
 import org.junit.AfterClass;
 import viewer.SQLiteViewer;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -66,11 +67,10 @@ public class ViewerTest extends SwingTest {
         requireEnabled(tablesComboBox);
 
         requireVisible(queryTextArea);
-        requireEnabled(queryTextArea);
-        requireEditable(queryTextArea);
+        requireDisabled(queryTextArea);
         requireEmpty(queryTextArea);
 
-        requireEnabled(queryButton);
+        requireDisabled(queryButton);
         requireVisible(queryButton);
 
         requireVisible(table);
@@ -232,6 +232,68 @@ public class ViewerTest extends SwingTest {
 
         if (correctNames.size() != 0) {
             return wrong("Can't find the following first names in the table:\n" + correctNames.toString());
+        }
+
+        return correct();
+    }
+
+    @DynamicTest(order = 8)
+    CheckResult testWrongFileName() {
+
+        fileNameTextField.deleteText().setText("wrong_file_name.db");
+        openFileButton.click();
+
+        Window[] windows = Window.getWindows();
+
+        boolean isDialogWindowFound = false;
+
+        for (Window window : windows) {
+            if (window instanceof JDialog) {
+                isDialogWindowFound = true;
+                window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
+            }
+        }
+
+        if (!isDialogWindowFound) {
+            return wrong("Can't find a JDialog window with 'Wrong file name!' error message");
+        }
+
+        return correct();
+    }
+
+    @DynamicTest(order = 9, feedback = "Query field and query execute button should be disabled if the wrong file name was entered!")
+    CheckResult testQueryComponentsAreDisabled() {
+        requireDisabled(queryButton);
+        requireDisabled(queryTextArea);
+        return correct();
+    }
+
+    @DynamicTest(order = 10)
+    CheckResult testWrongQueryDialogWindow() {
+
+        fileNameTextField.deleteText().setText(firstDatabaseFileName);
+        openFileButton.click();
+
+        requireEnabled(queryTextArea);
+        requireEnabled(queryButton);
+
+        queryTextArea.setText("SELECT * FROM wrong_table_name;");
+        queryButton.click();
+
+        Window[] windows = Window.getWindows();
+
+        boolean isDialogWindowFound = false;
+
+        for (Window window : windows) {
+            if (window instanceof JDialog) {
+                isDialogWindowFound = true;
+                window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
+                break;
+            }
+        }
+
+        if (!isDialogWindowFound) {
+            return wrong("Can't find a JDialog window with 'SQL exception' error message!");
         }
 
         return correct();

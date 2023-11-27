@@ -8,26 +8,20 @@ import java.util.ArrayList;
 
 public class DatabaseHandler {
     private final SQLiteDataSource dataSource;
-    private boolean connectionValid;
     private final DefaultTableModel tableModel;
 
     public DatabaseHandler(DefaultTableModel tableModel) {
         dataSource = new SQLiteDataSource();
         this.tableModel = tableModel;
-        connectionValid = false;
     }
 
-    public void connect(String fileName) {
+    public boolean connect(String fileName) {
         String url = "jdbc:sqlite:" + fileName;
         dataSource.setUrl(url);
         try (Connection connection = dataSource.getConnection()) {
-            if (connection.isValid(5)) {
-                connectionValid = true;
-            }
+            return connection.isValid(5);
         } catch (SQLException e) {
-            connectionValid = false;
-            System.out.println("Connection error");
-            System.out.println(e.getMessage());
+            return false;
         }
     }
     public static String getSelectQuery(String selectedTable) {
@@ -52,23 +46,19 @@ public class DatabaseHandler {
         return tables;
     }
 
-    public void execute(String query) {
-        if (!connectionValid) {
-            return;
-        }
+    public String execute(String query) {
         try (Connection connection = dataSource.getConnection()) {
             try (Statement statement = connection.createStatement()) {
                 if (query.matches("SELECT.*")) {
                     ResultSet resultSet = statement.executeQuery(query);
                     updateTable(resultSet);
                 } else {
-                    boolean result = statement.execute(query);
-                    System.out.println("query executed");
-                    System.out.println("received data: " + result);
+                    statement.execute(query);
                 }
+                return "OK";
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            return e.getMessage();
         }
     }
 
@@ -88,9 +78,5 @@ public class DatabaseHandler {
             }
             tableModel.addRow(row);
         }
-    }
-
-    public boolean isConnectionValid() {
-        return connectionValid;
     }
 }

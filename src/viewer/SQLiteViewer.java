@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.io.File;
 import java.util.ArrayList;
 
 public class SQLiteViewer extends JFrame {
@@ -42,12 +43,23 @@ public class SQLiteViewer extends JFrame {
         tableScrollPane.setBorder(new EmptyBorder(new Insets(0, 5, 5, 5)));
 
         openButton.addActionListener(a -> {
+//            tablesComboBox.setEnabled(false);
+            queryTextArea.setEnabled(false);
+            executeButton.setEnabled(false);
+            File file = new File(fileNameTextField.getText());
+            if (!file.exists()) {
+                JOptionPane.showMessageDialog(new JFrame(), "File doesn't exist!");
+                return;
+            }
             tablesComboBox.removeAllItems();
             queryTextArea.setText("");
-            database.connect(fileNameTextField.getText());
-            if (database.isConnectionValid()) {
+
+            if (database.connect(fileNameTextField.getText())) {
                 ArrayList<String> tables = database.getTables();
                 for (String t : tables) tablesComboBox.addItem(t);
+//                tablesComboBox.setEnabled(true);
+                queryTextArea.setEnabled(true);
+                executeButton.setEnabled(true);
             }
         });
         tablesComboBox.addActionListener(a -> {
@@ -56,7 +68,12 @@ public class SQLiteViewer extends JFrame {
                 queryTextArea.setText(DatabaseHandler.getSelectQuery(selectedTable));
             }
         });
-        executeButton.addActionListener(a -> database.execute(queryTextArea.getText()));
+        executeButton.addActionListener(a -> {
+            String response = database.execute(queryTextArea.getText());
+            if (!response.equals("OK")) {
+                JOptionPane.showMessageDialog(new JFrame(), response);
+            }
+        });
         JPanel panel = creator.createPanel(
                 dataBaseLabel,
                 fileNameTextField,

@@ -22,7 +22,9 @@ public class ComponentCreator {
     }
 
     public JButton createExecuteButton() {
-        return createButton("Execute", "ExecuteQueryButton");
+        JButton button = createButton("Execute", "ExecuteQueryButton");
+        button.setEnabled(false);
+        return button;
     }
 
     private JButton createButton(String text, String name) {
@@ -43,6 +45,7 @@ public class ComponentCreator {
         JComboBox<String> tablesComboBox = new JComboBox<>();
         tablesComboBox.setName("TablesComboBox");
         tablesComboBox.setPreferredSize(new Dimension(685, 25));
+//        tablesComboBox.setEnabled(false);
         return tablesComboBox;
     }
 
@@ -50,6 +53,7 @@ public class ComponentCreator {
     public JTextArea createQueryTextArea() {
         JTextArea textArea = new JTextArea();
         textArea.setName("QueryTextArea");
+        textArea.setEnabled(false);
         return textArea;
     }
 
@@ -72,6 +76,7 @@ public class ComponentCreator {
     public JTable getTable(TableModel model) {
         JTable table = new JTable(model);
         table.setName("Table");
+//        table.setEnabled(false);
         return table;
     }
 }
