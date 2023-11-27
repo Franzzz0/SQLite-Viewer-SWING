@@ -43,7 +43,7 @@ public class SQLiteViewer extends JFrame {
         tableScrollPane.setBorder(new EmptyBorder(new Insets(0, 5, 5, 5)));
 
         openButton.addActionListener(a -> {
-//            tablesComboBox.setEnabled(false);
+            tablesComboBox.setEnabled(false);
             queryTextArea.setEnabled(false);
             executeButton.setEnabled(false);
             File file = new File(fileNameTextField.getText());
@@ -57,7 +57,7 @@ public class SQLiteViewer extends JFrame {
             if (database.connect(fileNameTextField.getText())) {
                 ArrayList<String> tables = database.getTables();
                 for (String t : tables) tablesComboBox.addItem(t);
-//                tablesComboBox.setEnabled(true);
+                tablesComboBox.setEnabled(true);
                 queryTextArea.setEnabled(true);
                 executeButton.setEnabled(true);
             }

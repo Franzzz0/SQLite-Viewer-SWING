@@ -45,7 +45,7 @@ public class ComponentCreator {
         JComboBox<String> tablesComboBox = new JComboBox<>();
         tablesComboBox.setName("TablesComboBox");
         tablesComboBox.setPreferredSize(new Dimension(685, 25));
-//        tablesComboBox.setEnabled(false);
+        tablesComboBox.setEnabled(false);
         return tablesComboBox;
     }
 
@@ -76,7 +76,7 @@ public class ComponentCreator {
     public JTable getTable(TableModel model) {
         JTable table = new JTable(model);
         table.setName("Table");
-//        table.setEnabled(false);
+        table.setEnabled(false);
         return table;
     }
 }
